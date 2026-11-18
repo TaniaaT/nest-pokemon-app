@@ -27,6 +27,10 @@
 2. ejcecutar el comando de npm install
 3. tener nest cli- npm install -g nestjs@cli
 4. levantar la base de datos - docker-compose up -d
+5. clonar el archivo .env.template
+6. llenar las variables de entornos definiados
+7. ejecutar la aplicacion en dev con el comando npm star run:dev
+8. cargar la bd con la semilla en postman http://localhost:3000/api/v2/seed
 
 ## stack usado
 

@@ -4,13 +4,21 @@ import { UpdatePokemonDto } from './dto/update-pokemon.dto.js';
 import { isValidObjectId, Model } from 'mongoose';
 import { Pokemon } from './entities/pokemon.entity.js';
 import { InjectModel } from '@nestjs/mongoose';
+import { PaginationDTO } from './dto/pagination.dto.js';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class PokemonService {
-
+  private defafultLimit:number
   constructor(
     @InjectModel(Pokemon.name)
-    private readonly pokemonModel:Model<Pokemon>){}
+    private readonly pokemonModel:Model<Pokemon>,
+    private readonly configServe:ConfigService){
+      console.log(process.env.DEFAULT_LIMIT)
+      this.defafultLimit=this.configServe.get('defaultLimit')!
+
+    }
+
   async create(createPokemonDto: CreatePokemonDto) {
     createPokemonDto.name=createPokemonDto.name.toLocaleLowerCase()
     try{
@@ -21,8 +29,11 @@ export class PokemonService {
     }
   }
 
-  findAll() {
-    return `This action returns all pokemon`;
+  findAll(pagination:PaginationDTO) {
+    const {limit=this.defafultLimit,offset=0}=pagination
+    return this.pokemonModel.find().limit(limit).skip(offset).sort({
+      no:1 //ordene la columna "no"
+    }).select('-__v') //omitir el campo, todos los campos menos ese 
   }
 
   async findOne(term: string) {
@@ -77,5 +88,10 @@ export class PokemonService {
       console.log('error',error )
       throw new InternalServerErrorException('no se peude crasr el pokemon, revis els ervidpr')
 
+  }
+
+
+  async removeAll(){
+    await this.pokemonModel.deleteMany()
   }
 }
